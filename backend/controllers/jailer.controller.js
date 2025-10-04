@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import Jailer from "../models/jailer.model.js"; // adjust import
+import bcrypt from "bcryptjs";
 
 const jailerSignUp = async (req, res) => {
   try {
@@ -34,38 +35,37 @@ const jailerSignUp = async (req, res) => {
 };
 
 const jailerLogin = async (req, res) => {
-  try {
-    const { name, password } = req.body;
+    try {
+        const { name, password } = req.body;
+        if (!name || !password) {
+            return res.status(400).json({ message: "Name and password are required" });
+        }
 
-    if (!name || !password) {
-      return res.status(400).json({ message: "Name and password are required" });
+        const jailer = await Jailer.findOne({ name });
+        if (!jailer) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Compare plain password from req with hashed password in DB
+        const isMatch = await bcrypt.compare(password, jailer.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Invalid password" });
+        }
+
+        const token = jwt.sign(
+            { id: jailer._id, name: jailer.name },
+            "your_jwt_secret", // Use an environment variable for this!
+            { expiresIn: "1h" }
+        );
+
+        res.json({ message: "Login successful", token });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Error occurred in jailer.controller.js in jailerLogin");
     }
-
-    const jailer = await Jailer.findOne({ name });
-    if (!jailer) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // plain password comparison
-    if (jailer.password !== password) {
-      return res.status(400).json({ message: "Invalid password" });
-    }
-
-    const token = jwt.sign(
-      { id: jailer._id, name: jailer.name },
-      "your_jwt_secret",
-      { expiresIn: "1h" }
-    );
-
-    res.json({ message: "Login successful", token });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Error occurred in jailer.controller.js in jailerLogin");
-  }
 };
 
 export { jailerSignUp, jailerLogin };
-
 
 
 //  "type": "module",

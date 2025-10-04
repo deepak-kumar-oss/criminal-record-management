@@ -1,5 +1,5 @@
 import express from 'express';
-import { jailerLogin, jailerSignUp } from '../controllers/jailer.model.js';
+import { jailerLogin, jailerSignUp } from '../controllers/jailer.controller.js';
 
 const router = express.Router();
 
