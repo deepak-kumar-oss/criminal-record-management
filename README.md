@@ -84,7 +84,7 @@ You'll need to run both the backend and frontend servers simultaneously in two s
 * **Terminal 1: Start the Backend Server**
     ```bash
     # In the /backend directory
-    npm start
+    npm run dev
     ```
     Your backend server should now be running on `http://localhost:3000`.
 
@@ -111,3 +111,4 @@ The backend exposes the following REST API endpoints:
 | `POST` | `/api/criminal/create`      | Create a new inmate record.          |
 | `PUT`  | `/api/criminal/update/:id`  | Update an existing inmate record.    |
 | `DELETE`| `/api/criminal/delete/:id`  | Delete an inmate record.             |
+
